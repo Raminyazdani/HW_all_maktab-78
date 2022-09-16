@@ -1,0 +1,287 @@
+Index: excersizes/ex4.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/excersizes/ex4.py b/excersizes/ex4.py
+new file mode 100644
+--- /dev/null	(date 1660754789379)
++++ b/excersizes/ex4.py	(date 1660754789379)
+@@ -0,0 +1,43 @@
++import argparse
++import random
++
++
++def guess_game(start, end, test, score):
++    guess = test
++    while True:
++        if start < guess < end:
++            if guess == score:
++                print("you won")
++                return 0
++            elif guess > score:
++                print("your number is higher than the goal")
++                return 1
++            else:
++                print("your number is lower than the goal")
++                return 2
++        else:
++            print(f"number most between {start} and {end}")
++            guess = input("number : ")
++
++
++parser = argparse.ArgumentParser(description="python script for calculating averages")
++parser.add_argument("-s", "--start", type=int, required=True, default=0)
++parser.add_argument("-e", "--end", type=int, required=True, default=100)
++parser.add_argument("-g", "--guess", type=int, required=True)
++
++args = vars(parser.parse_args())
++score = random.randint(args["start"], args["end"])
++lives = 5
++
++while lives >= 1:
++    print(score)
++    cond = guess_game(args["start"], args["end"], args["guess"], score)
++
++    if cond == 0:
++        break
++    lives -= 1
++    print("lives : ", lives)
++    args["guess"] = int(input("your number : "))
++
++if cond!=0:
++    print("you lose")
+Index: excersizes/ex5.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/excersizes/ex5.py b/excersizes/ex5.py
+new file mode 100644
+--- /dev/null	(date 1660757137248)
++++ b/excersizes/ex5.py	(date 1660757137248)
+@@ -0,0 +1,72 @@
++import datetime
++
++
++def create_datetime(string: str) -> datetime:
++    return datetime.datetime.strptime(string, "%Y/%m/%d %H:%M:%S")
++
++
++def get_time(types: str) -> datetime:
++    while True:
++        test = input(f"please enter **{types}** date and time in this format\n"
++                     "%Y/%m/%d %H:%M:%S\n-->")
++        try:
++            result = create_datetime(test)
++            return result
++        except:
++            print("Invalid date format")
++            continue
++
++
++def generate_days(start_time, end_time, day):
++    temp = start_time
++    while temp <= end_time:
++        if temp.weekday() == day:
++            yield temp
++
++        temp += datetime.timedelta(days=1)
++
++
++if __name__ == '__main__':
++    # start_time: datetime = get_time("first")
++    # end_time: datetime = get_time("second")
++
++    # tests
++    start_time = create_datetime("2010/08/12 12:12:12")
++    end_time = create_datetime("2010/08/28 12:12:13")
++    if start_time > end_time:
++        start_time, end_time = end_time, start_time
++    weekday_n=[0,1,2,3,4,5,6]
++    weekdays=["saturday" ,"sunday","monday","tuesday","wednesday","thursday","friday"]
++    weekday_n_change=[5,6,0,1,2,3,4]
++    dictionary_weekday=list(zip(weekday_n,weekdays))
++    new_zip = list(zip(weekday_n,weekday_n_change))
++    while True:
++        [print(x[0],":",x[1]) for x in dictionary_weekday]
++        day = input("please enter a number between 0 to 6\nsaturday to friday in numbers\n-->")
++        try:
++            day = int(day)
++        except:
++            print("invalid input only numbers")
++            continue
++        if 0 <= day <= 6:
++            print(f"you choose {dictionary_weekday[day][1]}")
++            day = new_zip[day][1]
++            break
++        else:
++            print("only 0 to 6")
++            continue
++
++    days = generate_days(start_time, end_time, day)
++    temp = next(days)
++    print(temp.strftime("%Y-%m-%d %A"))
++    while True:
++        try:
++            temp = next(days)
++            cond = input("for continuing generating days only enter ")
++            if cond:
++                break
++            print(temp.strftime("%Y-%m-%d %A"))
++        except StopIteration:
++            break
++
++    print("end of the generator")
+Index: excersizes/ex2.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/excersizes/ex2.py b/excersizes/ex2.py
+new file mode 100644
+--- /dev/null	(date 1660744837440)
++++ b/excersizes/ex2.py	(date 1660744837440)
+@@ -0,0 +1,12 @@
++import argparse
++
++
++parser = argparse.ArgumentParser(description="python script for calculating averages")
++parser.add_argument("-g","--grades",type=float,nargs="+",required=True)
++parser.add_argument("-f","--float",type=int,required=False,default=2)
++
++args = vars(parser.parse_args())
++
++result = round(sum(args["grades"])/len(args["grades"]),args["float"])
++
++print(f"{result}")
+\ No newline at end of file
+Index: requirements.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-16LE
+===================================================================
+diff --git a/requirements.txt b/requirements.txt
+new file mode 100644
+--- /dev/null	(date 1660757905862)
++++ b/requirements.txt	(date 1660757905862)
+@@ -0,0 +1,4 @@
++jdatetime==4.1.0
++pip==22.2.2
++setuptools==63.4.1
++wheel==0.37.1
+Index: excersizes/ex1.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/excersizes/ex1.py b/excersizes/ex1.py
+new file mode 100644
+--- /dev/null	(date 1660743155814)
++++ b/excersizes/ex1.py	(date 1660743155814)
+@@ -0,0 +1,9 @@
++import sys
++
++numbers = sys.argv
++try:
++    numbers = list(map(lambda x: float(x), numbers[1:]))
++except:
++    print("wrong input , only integers and floats")
++
++print(sum(numbers) / len(numbers))
+Index: excersizes/ex3.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/excersizes/ex3.py b/excersizes/ex3.py
+new file mode 100644
+--- /dev/null	(date 1660753721509)
++++ b/excersizes/ex3.py	(date 1660753721509)
+@@ -0,0 +1,86 @@
++import datetime
++import jdatetime
++
++
++def create_datetime(string: str) -> datetime:
++    return datetime.datetime.strptime(string, "%Y/%m/%d %H:%M:%S")
++
++
++def get_time(types: str) -> datetime:
++    while True:
++        test = input(f"please enter **{types}** date and time in this format\n"
++                     "%Y/%m/%d %H:%M:%S\n-->")
++        try:
++            result = create_datetime(test)
++            return result
++        except:
++            print("Invalid date format")
++            continue
++
++
++def seconds_between(date1, date2) -> float:
++    return abs((date1 - date2).total_seconds())
++
++
++def is_leap(year: int) -> int:
++    if ((year % 400 == 0) or ((year % 100 != 0) and (year % 4 == 0))):
++        return True
++    return False
++
++
++def leap_years(date1: datetime, date2: datetime) -> int:
++    year_start = date1.year
++    year_end = date2.year
++    leaps = 0
++    print(year_start, " years", year_end)
++    for year in range(year_start, year_end):
++        if is_leap(year):
++            leaps += 1
++
++    return leaps
++
++
++def clock_change(date1: datetime, date2: datetime) -> int:
++    clock_change_freq = 0
++
++    temp = date1
++    while temp < date2:
++        if is_leap(temp.year):
++            if temp.day == 20 and temp.month == 3:
++                clock_change_freq += 1
++            elif temp.day == 21 and temp.month == 9:
++                clock_change_freq += 1
++        else:
++            if temp.day == 21 and temp.month == 3:
++                clock_change_freq += 1
++            elif temp.day == 22 and temp.month == 9:
++                clock_change_freq += 1
++        temp += datetime.timedelta(days=1)
++    return clock_change_freq
++
++
++def to_jalali(date):
++    return jdatetime.datetime.fromgregorian(year=date.year, month=date.month, day=date.day, hour=date.hour,
++                                            minute=date.minute, second=date.second)
++
++
++if __name__ == '__main__':
++    start_time:datetime = get_time("first")
++    end_time:datetime = get_time("second")
++
++    #tests
++    # start_time = create_datetime("2010/08/12 12:12:12")
++    # end_time = create_datetime("2022/08/17 12:12:13")
++
++    if start_time > end_time:
++        start_time, end_time = end_time, start_time
++    seconds: datetime.datetime.second = seconds_between(start_time, end_time)
++    leaps: int = leap_years(start_time, end_time)
++    freq: int = clock_change(start_time, end_time)
++    start_time_j = to_jalali(start_time)
++    end_time_j = to_jalali(end_time)
++    print("seconds between start and endtime : ",seconds)
++    print("number of leap years : ",leaps)
++    print("clock change frequency : " , freq)
++    print(start_time ," <-georgian  :  jalali-> " ,start_time_j)
++    print(end_time ," <-georgian  :  jalali-> " ,end_time_j)
