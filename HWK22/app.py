@@ -48,6 +48,7 @@ def index():  # put application's code here
 
 
 transacrion_args = reqparse.RequestParser()
+
 transacrion_args.add_argument("user", type=str, help="merchant_id is not correct", required=False, default=None)
 transacrion_args.add_argument("sort", type=str, help="sort only -1/1", required=False, choices=["1", "-1"],
                               default=None)
@@ -63,11 +64,13 @@ transacrion_args.add_argument("end_time", type=str,
 
 
 class Data(Resource):
+    data_last = {"0": "0"}
+
     def get(self):
-        x = AggregateQuery()
-        data = x.exec_query(col_primary, col_secondary)
-        print(data)
-        return jsonify(data)
+        # x = AggregateQuery()
+        # data = x.exec_query(col_primary, col_secondary)
+        # print(data)
+        return jsonify(Data.data_last)
 
     def post(self):
         # req = request.get_json(force=True)
@@ -87,10 +90,22 @@ class Data(Resource):
         x = AggregateQuery(**data_req)
         data = x.exec_query(col_primary, col_secondary)
         print(data)
+        Data.data_last = data
         return jsonify(data)
 
 
+class Data_merchants(Resource):
+
+    def get(self):
+        data_merch = col_primary.aggregate([{"$group":{"_id":"$merchantId"}},{"$project":{"merchant":"$_id","_id":0}}])
+        data_merch= list(data_merch)
+        data_merch =[{"merch_id":str(x["merchant"])} for x in data_merch]
+        print(data_merch)
+        return jsonify(data_merch)
+
+
 api.add_resource(Data, "/transaction/")
+api.add_resource(Data_merchants, "/merchants/")
 
 if __name__ == '__main__':
     app.run(debug=True)

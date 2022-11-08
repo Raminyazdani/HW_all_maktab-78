@@ -11,7 +11,7 @@
     <meta content="" name="keywords">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="fonts/icomoon/style.css">
+    <link rel="stylesheet" href="../static/callender/fonts/icomoon/style.css">
     <link rel="stylesheet" href="../static/callender/css/classic.css">
     <link rel="stylesheet" href="../static/callender/css/classic.date.css">
     <link rel="stylesheet" href="../static/callender/css/bootstrap.min.css">
@@ -22,8 +22,9 @@
     <script src="../static/callender/js/picker.js"></script>
     <script src="../static/callender/js/picker.date.js"></script>
     <script src="../static/callender/js/main.js"></script>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"
+            integrity="sha512-FJ2OYvUIXUqCcPf1stu+oTBlhn54W0UisZB/TNrZaVMHHhYvLBV9jMbvJYtvDe5x/WVaoXZ6KB+Uqe5hT2vlyA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link
             rel=
                     "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
@@ -47,7 +48,31 @@
 
 
     </script>
+    <script>
 
+        async function init_merchants() {
+            const merchants = await get_merchants();
+            const merchant_list = [];
+            for (let i = 0; i < merchants.length; i++) {
+                merchant_list.push(merchants[i]["merch_id"])
+            }
+            return merchant_list;
+        }
+
+        async function get_merchants() {
+            const url = 'http://127.0.0.1:5000/merchants/'
+            try {
+                let res = await fetch(url);
+                return res.json();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        var merchant_list = init_merchants()
+
+
+    </script>
 </head>
 
 <body>
@@ -237,8 +262,9 @@
 
                             <div class="d-flex flex-row justify-content-between align-items-center">
                                 <input type="text" class="form-control" id="user" name="user"
-                                       placeholder="merchant_id"
+                                       placeholder="merchant_id:6 OR 5"
                                        value=""
+                                       autocomplete="off"
                                 />
                             </div>
 
@@ -274,7 +300,8 @@
         <!-- End Card -->
 
         <div class="container_fluid">
-            <h2>zoomable Chart</h2>
+            <center><h2>chart is zoomable</h2></center>
+
             <div id="loading" class="justify-content-center" style="display: flex;background-color: white">
                 <center>
                     <img src="../static/Loading_icon.gif"></center>
@@ -287,6 +314,153 @@
 </main>
 
 <script>
+    async function autocomplete(inp) {
+        arr = await init_merchants()
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("select", function (e) {
+
+        }
+
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) {
+                show_recommend(a, b, i, val)
+            }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+
+        function show_recommend(a, b, i, val) {
+            var a, b, i, val = this.value;
+
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                /*create a DIV element for each matching element:*/
+                b = document.createElement("DIV");
+                /*make the matching letters bold:*/
+                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                b.innerHTML += arr[i].substr(val.length);
+                /*insert a input field that will hold the current array item's value:*/
+                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                /*execute a function when someone clicks on the item value (DIV element):*/
+                b.addEventListener("click", function (e) {
+                    /*insert the value for the autocomplete text field:*/
+                    inp.value = this.getElementsByTagName("input")[0].value;
+                    /*close the list of autocompleted values,
+                    (or any other open lists of autocompleted values:*/
+                    closeAllLists();
+                });
+                a.appendChild(b);
+            }
+
+
+        }
+
+        /*execute a function when someone clicks in the document:*/
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
+    }
+
+    /*An array containing all the country names in the world:*/
+
+    /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+    autocomplete(document.getElementById("user"));
+</script>
 
 
 </script>
@@ -304,8 +478,8 @@
                     type: 'POST',
                     url: 'http://127.0.0.1:5000/transaction/',
                     data: form_data,
-                    dataType:"json",
-                    contentType:"application/json",
+                    dataType: "json",
+                    contentType: "application/json",
                     error: function (request, status, error) {
                         console.log('Error: ' + error);
                     },
@@ -319,6 +493,7 @@
             return res
 
         } else {
+            get_data({})
             const url = 'http://127.0.0.1:5000/transaction/'
             try {
                 let res = await fetch(url);

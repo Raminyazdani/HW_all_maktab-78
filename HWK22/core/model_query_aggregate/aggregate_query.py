@@ -122,6 +122,7 @@ class AggregateQuery:
             result.append(project)
         sort = {'$sort': {'key': 1}}
         result.append(sort)
+
         # if self.time_type == "year":
         #     group = {"$group": {
         #         "_id": {"year": {"$year": "$createdAt"}},
